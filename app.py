@@ -8,8 +8,9 @@ import pickle
 # =========================
 st.set_page_config(
     page_title="Loan Prediction",
-    page_icon="🏦",
-    layout="wide"
+    page_icon="💰",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # =========================
@@ -24,6 +25,21 @@ scaler = pickle.load(open("scaler.pkl", "rb"))
 # =========================
 st.markdown("""
 <style>
+
+/* Make all labels white */
+div[data-testid="stWidgetLabel"] label{
+    color:white !important;
+    font-size:15px !important;
+    font-weight:700 !important;
+}
+
+.stNumberInput label{
+    color:white !important;
+}
+
+.stSelectbox label{
+    color:white !important;
+}
 
 .stApp{
     background:#0E1117;
@@ -74,15 +90,15 @@ div[data-testid="metric-container"] div{
 }
 
 #MainMenu{
-visibility:hidden;
+    visibility:hidden;
 }
 
 footer{
-visibility:hidden;
+    visibility:hidden;
 }
 
 header{
-visibility:hidden;
+    visibility:hidden;
 }
 
 </style>
@@ -91,68 +107,139 @@ visibility:hidden;
 # =========================
 # TITLE
 # =========================
-st.title("🏦 Loan Prediction System")
+# st.title("🏦 Loan Prediction System")
 
-st.markdown(
-    "Predict whether a loan application is likely to be **Approved** or **Rejected** using Machine Learning."
-)
+# st.markdown(
+#     "Predict whether a loan application is likely to be **Approved** or **Rejected** using Machine Learning."
+# )
 
 # =========================
 # SIDEBAR
 # =========================
-st.sidebar.header("Applicant Details")
+# st.sidebar.header("Applicant Details")
 
-person_income = st.sidebar.number_input(
-    "💰 Annual Income",
-    min_value=0.0,
-    value=50000.0
-)
+# person_income = st.sidebar.number_input(
+#     "💰 Annual Income",
+#     min_value=0.0,
+#     value=50000.0
+# )
 
-credit_score = st.sidebar.number_input(
-    "💳 Credit Score",
-    min_value=300,
-    max_value=900,
-    value=700
-)
+# credit_score = st.sidebar.number_input(
+#     "💳 Credit Score",
+#     min_value=300,
+#     max_value=900,
+#     value=700
+# )
 
-loan_amnt = st.sidebar.number_input(
-    "🏦 Loan Amount",
-    min_value=1000.0,
-    value=10000.0
-)
+# loan_amnt = st.sidebar.number_input(
+#     "🏦 Loan Amount",
+#     min_value=1000.0,
+#     value=10000.0
+# )
 
-person_age = st.sidebar.number_input(
-    "👤 Age",
-    18,
-    100,
-    25
-)
+# person_age = st.sidebar.number_input(
+#     "👤 Age",
+#     18,
+#     100,
+#     25
+# )
 
-person_gender = st.sidebar.selectbox(
-    "🚻 Gender",
-    encoders["person_gender"].classes_
-)
+# person_gender = st.sidebar.selectbox(
+#     "🚻 Gender",
+#     encoders["person_gender"].classes_
+# )
 
-person_emp_exp = st.sidebar.number_input(
-    "👔 Employment Experience (Years)",
-    min_value=0,
-    value=2
-)
+# person_emp_exp = st.sidebar.number_input(
+#     "👔 Employment Experience (Years)",
+#     min_value=0,
+#     value=2
+# )
 
-st.sidebar.markdown("---")
+# st.sidebar.markdown("---")
 
-st.sidebar.info("""
-**Model:** Random Forest Classifier
+# st.sidebar.info("""
+# **Model:** Random Forest Classifier
 
-**Framework:** Streamlit
+# **Framework:** Streamlit
 
-**Developer:** Sujal Gupta
-""")
+# **Developer:** Sujal Gupta
+# """)
+st.markdown("""
+<h1 style='text-align:center; color:white;'>
+🏦 Loan Prediction System
+</h1>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<p style='text-align:center; font-size:18px; color:#c9d1d9;'>
+Predict whether a loan application is likely to be
+<b>Approved</b> or <b>Rejected</b> using Machine Learning.
+</p>
+""", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ===============================
+# Applicant Card
+# ===============================
+
+left, center, right = st.columns([3,2,3])
+
+with center:
+
+    with st.container(border=True):
+
+        st.subheader("📝 Applicant Details")
+
+        person_income = st.number_input(
+            "💰 Annual Income",
+            min_value=0.0,
+            value=50000.0
+        )
+
+        credit_score = st.number_input(
+            "💳 Credit Score",
+            min_value=300,
+            max_value=900,
+            value=700
+        )
+
+        loan_amnt = st.number_input(
+            "🏦 Loan Amount",
+            min_value=1000.0,
+            value=10000.0
+        )
+
+        person_age = st.number_input(
+            "👤 Age",
+            18,
+            100,
+            25
+        )
+
+        person_gender = st.selectbox(
+            "🚻 Gender",
+            encoders["person_gender"].classes_
+        )
+
+        person_emp_exp = st.number_input(
+            "👔 Employment Experience",
+            min_value=0,
+            value=2
+        )
+
+        predict = st.button(
+            "🔍 Predict Loan Status",
+            use_container_width=True
+        )
+
+
 
 # =========================
 # PREDICTION
 # =========================
-if st.button("🔍 Predict Loan Status"):
+
+if predict:
 
     input_data = pd.DataFrame([{
         "person_income": person_income,
@@ -169,39 +256,44 @@ if st.button("🔍 Predict Loan Status"):
     probability = model.predict_proba(input_scaled)
 
     approve = probability[0][0]
+    reject = probability[0][1]
+
+    st.markdown("---")
+
+    st.header("📊 Prediction Result")
 
     if prediction == 0:
         st.success("✅ Loan Approved")
-        st.balloons()
     else:
         st.error("❌ Loan Rejected")
 
-    st.divider()
+    c1, c2 = st.columns(2)
 
-    st.subheader("📋 Applicant Information")
+    with c1:
+        st.metric("Approval Chance", f"{approve*100:.2f}%")
+
+    with c2:
+        st.metric("Rejection Chance", f"{reject*100:.2f}%")
+
+    st.progress(float(approve))
+
+    st.markdown("---")
+
+    st.subheader("📋 Applicant Summary")
 
     c1, c2, c3 = st.columns(3)
 
     c1.metric("💰 Income", f"₹{person_income:,.0f}")
     c2.metric("💳 Credit Score", credit_score)
-    c3.metric("🏦 Loan Amount", f"₹{loan_amnt:,.0f}")
+    c3.metric("🏦 Loan", f"₹{loan_amnt:,.0f}")
 
     c4, c5, c6 = st.columns(3)
 
     c4.metric("👤 Age", person_age)
     c5.metric("👔 Experience", f"{person_emp_exp} Years")
-    c6.metric("🚻 Gender", person_gender)
+    c6.metric("🚻 Gender", person_gender.capitalize())
 
-    st.divider()
-
-    st.subheader("📈 Prediction Confidence")
-
-    st.progress(float(approve))
-
-    st.write(f"### ✅ Approval Chance : {approve*100:.2f}%")
-    st.write(f"### ❌ Rejection Chance : {probability[0][1]*100:.2f}%")
-
-    st.divider()
+    st.markdown("---")
 
     st.subheader("⚠ Risk Level")
 
@@ -214,30 +306,27 @@ if st.button("🔍 Predict Loan Status"):
     else:
         st.error("🔴 High Risk Applicant")
 
-    st.divider()
+    st.markdown("---")
 
-    st.subheader("📌 Recommendation")
+    st.subheader("💡 Recommendation")
 
     if prediction == 0:
         st.success("""
-✔ Good credit score
+✅ Good credit score
 
-✔ Stable income
+✅ Stable income
 
-✔ Good employment history
+✅ Good employment experience
 
-✔ Eligible for loan approval
+✅ Loan is likely to be approved
 """)
-
     else:
         st.error("""
-• Improve your credit score
+❌ Improve your credit score
 
-• Reduce loan amount
+❌ Reduce the requested loan amount
 
-• Increase employment experience
+❌ Increase employment experience
 
-• Apply again after improving financial profile
+❌ Reapply after improving your financial profile
 """)
-        
-       
